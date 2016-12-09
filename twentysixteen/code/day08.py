@@ -61,8 +61,7 @@ class Screen(object):
 
     def print_screen(self):
         for row in self.screen:
-            row_str = str(row).strip('[]').replace('\n', '').replace('1', '*').replace('0', ' ')
-            print(row_str)
+            print(str(row).strip('[]').replace('\n', '').replace('1', '*').replace('0', ' '))
 
 
 class Test_Day08(unittest.TestCase):
