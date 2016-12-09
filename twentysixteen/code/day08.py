@@ -15,8 +15,7 @@ def main():
 
     screen = Screen((6, 50))
 
-    parsed_data = [line.split() for line in data]
-    screen.execute_instructions(parsed_data)
+    screen.execute_instructions(data)
 
     print("The number of lit pixels is: {}".format(screen.sum))
     print("Here's what the screen is trying to display:")
@@ -31,7 +30,8 @@ class Screen(object):
     def sum(self):
         return sum(self.screen.flat)
 
-    def execute_instructions(self, parsed_data):
+    def execute_instructions(self, data):
+        parsed_data = [line.split() for line in data]
         for line in parsed_data:
             if line[0] == 'rect':
                 dimensions = [int(num) for num in line[1].split('x')]
@@ -51,17 +51,13 @@ class Screen(object):
 
     def rotate(self, axis, index, by):
         temp = self.screen.take(index, axis)
-        beginning = temp[:-by].copy()
-        end = temp[-by:].copy()
-        return np.append(end, beginning)
+        return np.append(temp[-by:], temp[:-by])
 
     def rotate_column(self, index, by):
-        new = self.rotate(COLUMN, index, by)
-        self.screen[..., index] = new
+        self.screen[..., index] = self.rotate(COLUMN, index, by)
 
     def rotate_row(self, index, by):
-        new = self.rotate(ROW, index, by)
-        self.screen[index] = new
+        self.screen[index] = self.rotate(ROW, index, by)
 
     def print_screen(self):
         for row in self.screen:
