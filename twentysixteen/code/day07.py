@@ -17,7 +17,7 @@ def main():
           "Transport-Layer Snooping is: {}".format(len(addrs_with_tls)))
 
     addrs_with_ssl = [addr for addr in data if supports_ssl(addr)]
-    print("The number of IPs that supprt "
+    print("The number of IPs that support "
           "Super-Secret Listening is: {}".format(len(addrs_with_ssl)))
 
 
