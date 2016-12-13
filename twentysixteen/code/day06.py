@@ -49,7 +49,7 @@ def decode_least_common(parsed_data):
 
 
 class Test_Day06(unittest.TestCase):
-    with open(os.path.join(INPUTS, 'day06test.txt'), 'r') as data_file:
+    with open(os.path.join(INPUTS, 'day06.test.txt'), 'r') as data_file:
         test_data = data_file.readlines()
 
     def test_parse_data(self):
