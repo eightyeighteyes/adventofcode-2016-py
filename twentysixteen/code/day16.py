@@ -28,9 +28,8 @@ def transform(char):
 def expand(data):
     a = data
     b = [transform(c) for c in data]
-    b.reverse()
 
-    return "{}0{}".format(a, ''.join(b))
+    return "{}0{}".format(a, ''.join(reversed(b)))
 
 
 def make_checksum(data):
