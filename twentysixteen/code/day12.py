@@ -73,11 +73,11 @@ class Assembunny(object):
 
     def inc(self, *args):
         register = args[0]
-        self.incs.append(register)
+        self.registers[register] += 1
 
     def dec(self, *args):
         register = args[0]
-        self.decs.append(register)
+        self.registers[register] -= 1
 
     def jnz(self, *args):
         source = args[0]
