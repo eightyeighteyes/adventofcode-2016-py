@@ -21,31 +21,74 @@ def main():
           "the value of 'a' is: {}".format(reassembunny.registers['a']))
 
 
-VALID_REGISTERS = 'abcd'
+VALID_REGISTERS = ['a', 'b', 'c', 'd']
+
+
+def process_instruction(instruction):
+    instruction = instruction.split()
+    if len(instruction) > 2:
+        try:
+            instruction[2] = int(instruction[2])
+        except ValueError:
+            pass
+
+    return instruction
 
 
 class Assembunny(object):
     def __init__(self, instructions):
-        self.instructions = [instruction.split() for instruction in instructions]
+        self.instructions = [process_instruction(instruction) for instruction in instructions]
         self.registers = {register: 0 for register in VALID_REGISTERS}
+        self.address = 0
+        self.incs = []
+        self.decs = []
 
-    def cpy(self, source, destination):
+        self.instruction_map = {
+            'cpy': self.cpy,
+            'inc': self.inc,
+            'dec': self.dec,
+            'jnz': self.jnz
+        }
+
+    @property
+    def line(self):
+        return self.instructions[self.address]
+
+    @property
+    def command(self):
+        return self.line[0]
+
+    @command.setter
+    def command(self, value):
+        address = value[0]
+        self.instructions[address][0] = value[1]
+
+    def cpy(self, *args):
+        source = args[0]
+        destination = args[1]
         if source in VALID_REGISTERS:
             self.registers[destination] = self.registers[source]
         else:
             self.registers[destination] = int(source)
 
-    def inc(self, register):
-        self.registers[register] += 1
+    def inc(self, *args):
+        register = args[0]
+        self.incs.append(register)
 
-    def dec(self, register):
-        self.registers[register] -= 1
+    def dec(self, *args):
+        register = args[0]
+        self.decs.append(register)
 
-    def jnz(self, source, offset):
+    def jnz(self, *args):
+        source = args[0]
+        offset = args[1]
         if source in VALID_REGISTERS:
             value = self.registers[source]
         else:
             value = source
+
+        if offset in VALID_REGISTERS:
+            offset = self.registers[offset]
 
         if value:
             return int(offset)
@@ -53,20 +96,19 @@ class Assembunny(object):
             return 1
 
     def run(self):
-        i = 0
-        while i < len(self.instructions):
-            line = self.instructions[i]
-            command = line[0]
-            if command == 'cpy':
-                self.cpy(line[1], line[2])
-            elif command == 'inc':
-                self.inc(line[1])
-            elif command == 'dec':
-                self.dec(line[1])
-            elif command == 'jnz':
-                i += self.jnz(line[1], line[2])
+        while self.address < len(self.instructions):
+            arg1 = self.line[1]
+            try:
+                arg2 = self.line[2]
+            except IndexError:
+                arg2 = None
+
+            if self.command == 'jnz':
+                self.address += self.jnz(arg1, arg2)
                 continue
-            i += 1
+            else:
+                self.instruction_map[self.command](arg1, arg2)
+            self.address += 1
 
 
 class Test_Day12(unittest.TestCase):
@@ -104,6 +146,13 @@ class Test_Day12(unittest.TestCase):
         self.assertEqual(0, assembunny.registers['b'])
         self.assertEqual(0, assembunny.registers['c'])
         self.assertEqual(0, assembunny.registers['d'])
+
+    def test_indexed_setter(self):
+        assembunny = self.assembunny
+        assembunny.command = [1, 'dingus']
+        assembunny.address = 1
+
+        self.assertEqual('dingus', assembunny.command)
 
 
 if __name__ == '__main__':
